@@ -1,0 +1,1 @@
+Yes, the former mutates the caller while the latter does not.
