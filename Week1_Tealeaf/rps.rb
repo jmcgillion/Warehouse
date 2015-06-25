@@ -2,10 +2,11 @@ CHOICES = {'r' => "rock", 'p' => "papers", 's' => "scissors"}
 puts "Let's play rock, papers scissors."
 
 loop do 
+
   begin
 	"Please choose (r) for rock, (p) for papers and (s) for scissors."
 	player_play = gets.chomp.downcase
-end until CHOICES.include?(player_play)
+  end until CHOICES.include?(player_play)
 
   computer_play = CHOICES.values.sample
 
@@ -20,7 +21,7 @@ end until CHOICES.include?(player_play)
 
 
 	
-end
+
 
 if player_play == "rock"
 	if computer_play == "rock"
