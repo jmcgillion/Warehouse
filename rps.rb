@@ -11,6 +11,9 @@ def declare_winner(winning_choice)
 end
 
 
+
+
+
 loop do
 
 begin
@@ -44,16 +47,4 @@ if response == "n"
  end
    
 end
-
-
-
-
-
-
-
-
-
-
-
-
 

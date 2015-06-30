@@ -1,7 +1,0 @@
-statement = "The Flintstones Rock!"
-
-arr = (A..Z).to_a + (a..z).to_a
-
-arr.each do |letter|
-  letter_frequency = statement.scan(letter).count
- 

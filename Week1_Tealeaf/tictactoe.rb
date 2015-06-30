@@ -6,7 +6,7 @@ def initiate_board
 end
 
 
- def draw_board(board)
+def draw_board(board)
  	system "clear"
  	puts
 	puts "#{board[1]} | #{board[2]} | #{board[3]}"
@@ -20,13 +20,13 @@ end
 def empty_positions(board)
   board.keys.select do|position|
   board[position] = " "
-  end
 end
+
 
 def player_makes_move(board)
 	begin
-		puts "Choose a position (1) thru (9) to make a move:"
-	  position = gets.chomp.to_i
+	puts "Choose a position (1) thru (9) to make a move:"
+	position = gets.chomp.to_i
   end until empty_positions(board).include?(position)
   board[position] = "X"
 end
@@ -46,7 +46,7 @@ def get_winner(board)
 	end
 
 def nine_positions_filled(board)
-	empty_positions(board) == [ ]
+	empty_positions(board) == []
 end
 
 def declare_winner(winner)
@@ -72,3 +72,5 @@ if winner
 else 
 	puts "We have a tie."
 end
+
+
