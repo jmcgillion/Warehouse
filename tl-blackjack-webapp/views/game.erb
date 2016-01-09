@@ -14,7 +14,7 @@
    	 <strong>Another round?</strong> 
 		 <a href="/bet" class="btn btn-primary">Yes</a>
 		 <a href="/game_over" class="btn">No</a>
-		</p>
+	</p>
 	<%end%>
 
 	<div class="well">
@@ -28,18 +28,19 @@
   <% end %>
 	
 
-	<% if @dealer_hit_button %>
+	<% if @show_dealer_hit_button %>
+
 		<p>
 	  <h5>Dealer has <%= calculate_total(session[:dealer_cards])%> and will hit. </h5>
 	  <form id="dealer hit" action="/game/dealer/hit" method="post">
 	  	<input type="submit"  class="btn btn-primary" value="what the Dealer has. &rarr;">
 	  </form>
-	 </p>
+	</p>
+	 
 	 <% end %>
 	</div>
 
-
-<br/>
+</br>
 <div class="well" id="player">
 	<h4>Your cards, sir.</h4>
 	<% session[:player_cards].each do |card| %>
@@ -47,25 +48,31 @@
 	 <% end %>
 
 	<h5>
-		<%= session[:player_name] %> has $<%= session[:player_pot] %> and bet <%= session[:player_bet]%> this round.
+		<%= session[:player_name] %> has <%= session[:player_pot] %> and bet <%= session[:player_bet]%> this round.
 	</h5>
 </div>
 
 	
 	<p>
-		What would <%=session[:player_name]%> like to do?
-	<%= session[:player_name] %> has <%= calculate_total(sssion[:player_cards]) %>
-
-	<% if @show_or_hit_buttons<%>
+		
+	<% if @show_hit_or_stay_buttons %>
+	 <h5>What would <%=session[:player_name]%> like to do? </h5>
 	  <form id="hit_form" action ="/game/player/hit" method="post">
-	  	<input type="submit" class="btn btn-success" value="Hit" />
+	  	<input type="submit" class="btn btn-success" value="Hit"/>
 	  </form>
 	   <form id="stay_form" action ="/game/player/stay" method="post">
-	  	<input type="submit" class="btn btn-warning" value="Stay" />
+	  	<input type="submit" class="btn btn-warning" value="Stay"/>
 	  </form>
-	 <% end %>
-	</p>
+	<% end %>
+</p>
+	
 </div>
+
+
+
+
+
+
 	  
 
 

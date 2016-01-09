@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'rubygems'
+require 'pry'
 
 set :sessions, true
 
@@ -7,9 +8,10 @@ BLACKJACK_AMOUNT = 21
 DEALER_MIN_HIT = 17
 INITIAL_POT_AMOUNT = 500
 
+
 helpers do 
 	def calculate_total(cards)
-	  arr = cards.map {|e| e[1]}
+	  arr = cards.map{|e| e[1]}
 
 	  total = 0
 		arr.each do |card|
@@ -25,11 +27,13 @@ helpers do
 		if total > 21
     arr.select {|card| card == "A"}.count.times do |total|
       break if total <= BLACKJACK_AMOUNT
-      total -= 10
+		total -= 10
+	  end
     end
 
-    total
-	end
+		total
+	
+end
 
 	def card_image(card)
 		suit = case card[0]
@@ -52,16 +56,16 @@ helpers do
 		"<img src='/images/cards/#{suit}_#{value}.jpg' class='card_image'>"
 	end
 
-	def winner!(msg)
+def winner!(msg)
 		@play_again = true
-		@show_or_hit_buttons = false
+		@show_hit_or_stay_buttons = false
 		session[:player_pot] = session[:player_pot] + session[:player_bet]
 		@winner = "<strong>#{session[:player_name]} wins!</strong>#{msg}"
 	end
 
 	def loser!(msg)
 		@play_again = true
-		@show_or_hit_buttons = false
+		@show_hit_or_stay_buttons = false
 		session[:player_pot] = session[:player_pot] - session[:player_bet]
 		@loser ="<strong>#{session[:player_name]} loses.  You'll have to perhaps give it another go ...</strong>#{msg}"
 	end
@@ -92,11 +96,10 @@ get '/new_player' do
 end
 
 post '/new_player' do
-  if params[:player_name].empty?
+   if params[:player_name].empty?
   	@error = "Sorry but your epithet is mandatory."
-  	halt erb (:new_player)
-  end
-  
+  	halt erb(:new_player)
+   end
   	session[:player_name] = params[:player_name]
   	redirect '/bet'
  end
@@ -111,7 +114,7 @@ post '/bet' do
 		@error = "It's time to lay something down on the line pal.  It doesn't have to be everything but it's got to be something."
 		halt erb(:bet)
 	elsif params[:bet_amount].to_i > session[:player_pot]
-		@error = "You don't have that bro. You have ($#{session[:player_pot]}). You'll have to try again."
+		@error = "You don't have that bro. You have #{session[:player_pot]}. You'll have to try again."
 	else
 		session[:player_bet] = params[:bet_amount].to_i
 		redirect '/game'
@@ -121,9 +124,9 @@ end
 get '/game' do
 	session[:turn] = session[:player_name]
 
-	suit = ['H', 'D', 'S', 'C']
-	value = %w(A 2 3 4 5 6 7 8 9 10 J Q K)
-	session[:deck] = suit.product(value)
+	suits = ['H', 'D', 'S', 'C']
+	values = %w(A 2 3 4 5 6 7 8 9 10 J Q K)
+	session[:deck] = suits.product(values).shuffle!
 
 	session[:dealer_cards] = []
 	session[:player_cards] = []
@@ -133,18 +136,23 @@ get '/game' do
 	session[:dealer_cards] << session[:deck].pop
 	session[:player_cards] << session[:deck].pop
 
-	erb :game
+	player_total = calculate_total(session[:player_cards])
 
+	if player_total == BLACKJACK_AMOUNT
+		winner!("You have hit blackjack!  You win !")
+	end
+
+	erb :game
 end
 
-post 'game/player/hit' do
+post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
 
   player_total = calculate_total(session[:player_cards])
 	if player_total == BLACKJACK_AMOUNT
-  	winner!("#{session[:player_name]} Congrats!  That's better than black. You've hit Blackjack!")
+  	winner!("#{session[:player_name]} Congrats! You've hit Blackjack!")
   elsif player_total > BLACKJACK_AMOUNT
-  	loser!("Looks like you've gone bust with a total of #{session[:player_total]}.  Please try your luck next time.")
+  	loser!("Looks like you've gone bust.  Please try your luck next time.")
   end
 
   erb :game, layout: false
@@ -162,10 +170,10 @@ get '/game/dealer' do
 
 	dealer_total = calculate_total(session[:dealer_cards])
 
-	if dealer_total == BLACKJACK_AMOUNT
-		loser!("The BJ Dealer has been 'wheelin and dealin'. Luck is the residue of Good Design. Try again.")
-	elsif dealer_total > BLACKJACK_AMOUNT
-		winner!("Looks like a rose.  The dealer has busted.  #{session[:player_name]} has won !!!}")
+  if dealer_total == BLACKJACK_AMOUNT
+		loser!("The BJ Dealer has hit blackjack. Luck is the residue of Good Design ... so Try again.")
+	elsif dealer_total >= BLACKJACK_AMOUNT
+		winner!("Looks like a rose.  #{session[:player_name]} has won !!!")
 	elsif dealer_total >= DEALER_MIN_HIT
 		redirect '/game/compare'
 	else
@@ -187,11 +195,11 @@ get '/game/compare' do
 	dealer_total = calculate_total(session[:dealer_cards])
 
 	if player_total > dealer_total
-		winner!("Let's pop some champage, #{player_name}.  You've won with a total of #{player_total}.")
+		winner!("Let's pop some champagne, #{session[:player_name]}.  You've won with a total of #{player_total}.")
 	elsif dealer_total > player_total
 		loser!("We are sorry but the dealer's #{dealer_total} beats your #{player_total}.")
 	else
-		tie!("Both yourself #{player_name} and the dealer stayed on the island of #{player_total}.")
+		tie!("Both yourself #{session[:player_name]} and the dealer stayed on the island of #{player_total}.")
 	end
 
 	erb :game, layout: false
@@ -201,7 +209,11 @@ get '/game_over' do
 	erb :game_over
 end
 
-end
+
+
+
+
+
 
 
 
